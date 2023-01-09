@@ -4,6 +4,7 @@ import time
 import json
 import copy
 from dotenv import load_dotenv, dotenv_values
+import requests
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
@@ -15,24 +16,31 @@ from seleniumwire import webdriver
 
 
 def get_magic_auth_code():
+    global driver
     driver.get(
         "https://adelb.univ-lyon1.fr/direct/index.jsp?projectId=2&ShowPianoWeeks=true&days=0")
     driver.find_element(By.ID, "username").click()
-    driver.find_element(By.ID, "username").send_keys(dotenv_values(".env")["USERNAME"]")
+    driver.find_element(By.ID, "username").send_keys(
+        dotenv_values(".env")["USERNAME"])
     driver.find_element(By.ID, "password").click()
     driver.find_element(By.ID, "password").send_keys(
-        dotenv_values(".env")["PASSWORD"]")
+        dotenv_values(".env")["PASSWORD"])
     driver.find_element(By.NAME, "submit").click()
-    time.sleep(5)
-    driver.find_element(
-        By.CSS_SELECTOR, "#Direct\\ Planning\\ Tree_-1 .x-tree3-node-joint").click()
-    return str(driver.last_request.body).split("|")[-44]
-# 7|0|20|https://adelb.univ-lyon1.fr/direct/gwtdirectplanning/|D299C8C3CA21CA5E6AFCED14CFFB2A29|com.adesoft.gwt.directplan.client.rpc.DirectPlanningServiceProxy|method4getChildren|J|java.lang.String/2004016611|com.adesoft.gwt.directplan.client.ui.tree.TreeResourceConfig/2234901663|{"-1""true""0""-1""0""0""0""false"[1]{"StringField""NAME""LabelName""Etudiants (groupes)""false""false""""trainee""1""0"[0][0]|[I/2970817851|java.util.LinkedHashMap/3008245022|COLOR|com.adesoft.gwt.core.client.rpc.config.OutputField/870745015|LabelColor||com.adesoft.gwt.core.client.rpc.config.FieldType/1797283245|NAME|LabelName|java.util.ArrayList/4159755760|com.extjs.gxt.ui.client.data.SortInfo/1143517771|com.extjs.gxt.ui.client.Style$SortDir/3873584144|1|2|3|4|3|5|6|7|YWWrj9S|8|7|0|9|2|-1|-1|10|0|2|6|11|12|0|13|11|14|15|11|0|0|6|16|12|0|17|16|14|15|4|0|0|18|0|18|0|19|20|1|16|18|0|
-# make request for everione recursively
+    time.sleep(3)
+    # driver.find_element(
+    #     By.CSS_SELECTOR, "#Direct\\ Planning\\ Tree_-1 .x-tree3-node-joint").click()
+    # time.sleep(1)
+    for i in driver.requests:
+        if "YW" in str(i.body) and "|" in str(i.body):
+            tab = str(i.body).split("|")
+            for t in tab:
+                if "YW" in t:
+                    return t
+    print(str(driver.last_request))
+    return str(driver.last_request.body).split("|")[-3]
 
 
 class Dir:
-
     def __init__(self):
         self.name = ""
         self.children = []
@@ -47,15 +55,15 @@ class Dir:
 
 
 def request_to_dirs(dir, rawData):
-    fields = rawData.split("{\"StringField")
+    fields = rawData.split("{\\\"StringField")
     fields = fields[1:]
     dirs = []
     names = []
     ids = []
     for field in fields:
-        subfields = field.split("\"\"")
+        subfields = field.split("\\\"\\\"")
         names.append(subfields[3])
-        ids.append(subfields[9].split("\"")[2])
+        ids.append(subfields[9].split("\\\"")[2])
     dir.name = names[0]
     for i in range(0, len(ids)-1):
         dirs.append(Dir())
@@ -64,24 +72,40 @@ def request_to_dirs(dir, rawData):
     return dirs
 
 
-# data = '//OK[1,["{\"0\"{\"-1\"\"true\"\"0\"\"10\"\"0\"\"9\"\"0\"\"false\"[1]{\"StringField\"\"NAME\"\"LabelName\"\"Etudiants (groupes)\"\"false\"\"false\"\"\"\"trainee\"\"1\"\"0\"[0][0][10]{\"102791\"\"false\"\"1\"\"-1\"\"0\"\"0\"\"0\"\"false\"[2]{\"ColorField\"\"COLOR\"\"LabelColor\"\"255,255,255\"\"false\"\"false\"{\"StringField\"\"NAME\"\"LabelName\"\"\"\"false\"\"false\"\"\"\"trainee\"\"1\"\"2\"[0][0]{\"102792\"\"false\"\"1\"\"-1\"\"1\"\"1\"\"0\"\"false\"[2]{\"ColorField\"\"COLOR\"\"LabelColor\"\"255,255,255\"\"false\"\"false\"{\"StringField\"\"NAME\"\"LabelName\"\"\"\"false\"\"false\"\"\"\"trainee\"\"1\"\"2\"[0][0]{\"102793\"\"false\"\"1\"\"-1\"\"2\"\"2\"\"0\"\"false\"[2]{\"ColorField\"\"COLOR\"\"LabelColor\"\"255,255,255\"\"false\"\"false\"{\"StringField\"\"NAME\"\"LabelName\"\"\"\"false\"\"false\"\"\"\"trainee\"\"1\"\"2\"[0][0]{\"102794\"\"false\"\"1\"\"-1\"\"3\"\"3\"\"0\"\"false\"[2]{\"ColorField\"\"COLOR\"\"LabelColor\"\"255,255,255\"\"false\"\"false\"{\"StringField\"\"NAME\"\"LabelName\"\"\"\"false\"\"false\"\"\"\"trainee\"\"1\"\"2\"[0][0]{\"8009\"\"true\"\"1\"\"-1\"\"4\"\"4\"\"0\"\"false\"[2]{\"ColorField\"\"COLOR\"\"LabelColor\"\"255,255,255\"\"false\"\"false\"{\"StringField\"\"NAME\"\"LabelName\"\"DOUA\"\"false\"\"false\"\"DOUA\"\"trainee\"\"1\"\"0\"[0][0]{\"8163\"\"true\"\"1\"\"-1\"\"5\"\"5\"\"0\"\"false\"[2]{\"ColorField\"\"COLOR\"\"LabelColor\"\"255,255,255\"\"false\"\"false\"{\"StringField\"\"NAME\"\"LabelName\"\"Erreur_Groupe\"\"false\"\"false\"\"Erreur_Groupe\"\"trainee\"\"1\"\"1\"[0][0]{\"9473\"\"true\"\"1\"\"-1\"\"6\"\"6\"\"0\"\"false\"[2]{\"ColorField\"\"COLOR\"\"LabelColor\"\"255,255,255\"\"false\"\"false\"{\"StringField\"\"NAME\"\"LabelName\"\"GERLAND\"\"false\"\"false\"\"GERLAND\"\"trainee\"\"1\"\"0\"[0][0]{\"7792\"\"true\"\"1\"\"-1\"\"7\"\"7\"\"0\"\"false\"[2]{\"ColorField\"\"COLOR\"\"LabelColor\"\"255,255,255\"\"false\"\"false\"{\"StringField\"\"NAME\"\"LabelName\"\"INSPE\"\"false\"\"false\"\"INSPE\"\"trainee\"\"1\"\"0\"[0][0]{\"7563\"\"true\"\"1\"\"-1\"\"8\"\"8\"\"0\"\"false\"[2]{\"ColorField\"\"COLOR\"\"LabelColor\"\"255,255,255\"\"false\"\"false\"{\"StringField\"\"NAME\"\"LabelName\"\"IUT\"\"false\"\"false\"\"IUT\"\"trainee\"\"1\"\"0\"[0][0]{\"7970\"\"true\"\"1\"\"-1\"\"9\"\"9\"\"0\"\"false\"[2]{\"ColorField\"\"COLOR\"\"LabelColor\"\"255,255,255\"\"false\"\"false\"{\"StringField\"\"NAME\"\"LabelName\"\"SANTE\"\"false\"\"false\"\"SANTE\"\"trainee\"\"1\"\"0\"[0][0]\"false\""],0,7]'
-# dir = Dir()
-# dir.id = -1
-# dirs = request_to_dirs(dir, data)
-# dir.children.extend(dirs)
-# print(dir)
-# for dirtmp in dirs:
-#     print(dirtmp)
+driver = webdriver.Firefox()
+magic_auth_code = get_magic_auth_code()
+session = requests.Session()
+for cookie in driver.get_cookies():
+    print(cookie["name"], cookie["value"])
+    session.cookies.set(cookie["name"], cookie["value"])
 
+data = '7|0|20|https://adelb.univ-lyon1.fr/direct/gwtdirectplanning/|D299C8C3CA21CA5E6AFCED14CFFB2A29|com.adesoft.gwt.directplan.client.rpc.DirectPlanningServiceProxy|method4getChildren|J|java.lang.String/2004016611|com.adesoft.gwt.directplan.client.ui.tree.TreeResourceConfig/2234901663|{"-1""true""0""-1""0""0""0""false"[1]{"StringField""NAME""LabelName""Etudiants (groupes)""false""false""""trainee""1""0"[0][0]|[I/2970817851|java.util.LinkedHashMap/3008245022|COLOR|com.adesoft.gwt.core.client.rpc.config.OutputField/870745015|LabelColor||com.adesoft.gwt.core.client.rpc.config.FieldType/1797283245|NAME|LabelName|java.util.ArrayList/4159755760|com.extjs.gxt.ui.client.data.SortInfo/1143517771|com.extjs.gxt.ui.client.Style$SortDir/3873584144|1|2|3|4|3|5|6|7|' + \
+    magic_auth_code+'|8|7|0|9|2|-1|-1|10|0|2|6|11|12|0|13|11|14|15|11|0|0|6|16|12|0|17|16|14|15|4|0|0|18|0|18|0|19|20|1|16|18|0|'
 
-# element = driver.find_element(
-#     By.CSS_SELECTOR, "#x-auto-29 .x-btn-image")
-# actions = ActionChains(driver)
-# actions.move_to_element(element).perform()
-# driver.find_element(
-#     By.CSS_SELECTOR, "#x-auto-318 .x-btn-text").click()
-# driver.find_element(
-#     By.CSS_SELECTOR, "#x-auto-354 .x-btn-text").click()
-
-# driver = webdriver.Firefox()
-# magic_auth_code = get_magic_auth_code()
+response = session.post(
+    'https://adelb.univ-lyon1.fr/direct/gwtdirectplanning/DirectPlanningServiceProxy',
+    data=data,
+    cookies=session.cookies,
+    headers={
+        'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:108.0) Gecko/20100101 Firefox/108.0',
+        'Accept': '*/*',
+        'Accept-Language': 'fr,fr-FR;q=0.8,en-US;q=0.5,en;q=0.3',
+        'Content-Type': 'text/x-gwt-rpc; charset=utf-8',
+        'X-GWT-Permutation': '7F5A0F77AAF986456BB12F64AF900F31',
+        'X-GWT-Module-Base': 'https://adelb.univ-lyon1.fr/direct/gwtdirectplanning/',
+        'Origin': 'https://adelb.univ-lyon1.fr',
+        'Connection': 'keep-alive',
+        'Referer': 'https://adelb.univ-lyon1.fr/direct/index.jsp?projectId=2&ShowPianoWeeks=true&days=0&ticket=ST-3100507-cRkd5pGuT37xEZrFrNkK-cas.univ-lyon1.fr',
+        'Sec-Fetch-Dest': 'empty',
+        'Sec-Fetch-Mode': 'cors',
+        'Sec-Fetch-Site': 'same-origin',
+    }
+)
+data = response.text
+dir = Dir()
+dir.id = -1
+dirs = request_to_dirs(dir, data)
+dir.children.extend(dirs)
+print(dir)
+for dirtmp in dirs:
+    print(dirtmp)
