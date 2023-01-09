@@ -1,3 +1,9 @@
+get address:
+
+http://adelb.univ-lyon1.fr/jsp/custom/modules/plannings/anonymous_cal.jsp?resources=7311&projectId=2&calType=ical&firstDate=2023-01-09&lastDate=2023-01-09
+remplacer la resources par id de la ressource
+
+
 get root:
 
 //OK[1,["{\"0\"{\"-100\"\"true\"\"-1\"\"5\"\"0\"\"4\"\"0\"\"false\"[0]\"\"\"\"\"0\"\"0\"[0][0][5]
