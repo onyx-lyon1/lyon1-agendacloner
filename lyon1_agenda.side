@@ -1,0 +1,145 @@
+{
+  "id": "b3ec2b73-beb8-4feb-9eb7-1f8bf223acfb",
+  "version": "2.0",
+  "name": "lyon1_agenda",
+  "url": "https://adelb.univ-lyon1.fr",
+  "tests": [{
+    "id": "2e5115c0-78cd-40a0-8a87-73cc415d04c3",
+    "name": "1",
+    "commands": [{
+      "id": "07db5f90-3de3-43ae-aeca-2223e73c6acc",
+      "comment": "",
+      "command": "open",
+      "target": "/direct/index.jsp?projectId=2&ShowPianoWeeks=true&days=0",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "68e2c70e-af27-4073-990d-dbac8a9fc129",
+      "comment": "",
+      "command": "setWindowSize",
+      "target": "1920x1007",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "2e6c5a19-d5aa-4908-9b61-ce524264b903",
+      "comment": "",
+      "command": "click",
+      "target": "css=#Direct\\ Planning\\ Tree_-1 .x-tree3-node-joint",
+      "targets": [
+        ["css=#Direct\\ Planning\\ Tree_-1 .x-tree3-node-joint", "css:finder"],
+        ["xpath=(//img[contains(@src,'https://adelb.univ-lyon1.fr/direct/gwtdirectplanning/clear.cache.gif')])[4]", "xpath:img"],
+        ["xpath=//div[@id='Direct Planning Tree_-1']/div/img[2]", "xpath:idRelative"],
+        ["xpath=//img[2]", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "38580eab-632f-4479-ab08-d8cd5fe274e3",
+      "comment": "",
+      "command": "click",
+      "target": "css=#Direct\\ Planning\\ Tree_8009 .x-tree3-node-joint",
+      "targets": [
+        ["css=#Direct\\ Planning\\ Tree_8009 .x-tree3-node-joint", "css:finder"],
+        ["xpath=(//img[contains(@src,'https://adelb.univ-lyon1.fr/direct/gwtdirectplanning/clear.cache.gif')])[10]", "xpath:img"],
+        ["xpath=//div[@id='Direct Planning Tree_8009']/div/img[2]", "xpath:idRelative"],
+        ["xpath=//div[6]/table/tbody/tr/td[2]/div/div/div/img[2]", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "6e23518b-2f1a-4cdd-9193-402baeb649d1",
+      "comment": "",
+      "command": "click",
+      "target": "css=#Direct\\ Planning\\ Tree_7560 .x-tree3-node-joint",
+      "targets": [
+        ["css=#Direct\\ Planning\\ Tree_7560 .x-tree3-node-joint", "css:finder"],
+        ["xpath=(//img[contains(@src,'https://adelb.univ-lyon1.fr/direct/gwtdirectplanning/clear.cache.gif')])[12]", "xpath:img"],
+        ["xpath=//div[@id='Direct Planning Tree_7560']/div/img[2]", "xpath:idRelative"],
+        ["xpath=//div[7]/table/tbody/tr/td[2]/div/div/div/img[2]", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "21a7dbd5-629a-433e-9440-18e6f1fce916",
+      "comment": "",
+      "command": "click",
+      "target": "css=#Direct\\ Planning\\ Tree_8898 .x-tree3-node-joint",
+      "targets": [
+        ["css=#Direct\\ Planning\\ Tree_8898 .x-tree3-node-joint", "css:finder"],
+        ["xpath=(//img[contains(@src,'https://adelb.univ-lyon1.fr/direct/gwtdirectplanning/clear.cache.gif')])[14]", "xpath:img"],
+        ["xpath=//div[@id='Direct Planning Tree_8898']/div/img[2]", "xpath:idRelative"],
+        ["xpath=//div[8]/table/tbody/tr/td[2]/div/div/div/img[2]", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "6c0d952b-8b2a-425f-b369-a7d571e32eab",
+      "comment": "",
+      "command": "click",
+      "target": "css=#Direct\\ Planning\\ Tree_24833 .x-tree3-node-joint",
+      "targets": [
+        ["css=#Direct\\ Planning\\ Tree_24833 .x-tree3-node-joint", "css:finder"],
+        ["xpath=(//img[contains(@src,'https://adelb.univ-lyon1.fr/direct/gwtdirectplanning/clear.cache.gif')])[16]", "xpath:img"],
+        ["xpath=//div[@id='Direct Planning Tree_24833']/div/img[2]", "xpath:idRelative"],
+        ["xpath=//div[9]/table/tbody/tr/td[2]/div/div/div/img[2]", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "2cfde7c9-72db-419a-ad59-2d638a90d30a",
+      "comment": "",
+      "command": "click",
+      "target": "css=#x-auto-29 .x-btn-image",
+      "targets": [
+        ["css=#x-auto-29 .x-btn-image", "css:finder"],
+        ["xpath=(//img[contains(@src,'https://adelb.univ-lyon1.fr/direct/gwtdirectplanning/clear.cache.gif')])[41]", "xpath:img"],
+        ["xpath=//table[@id='x-auto-29']/tbody/tr[2]/td[2]/em/button/img", "xpath:idRelative"],
+        ["xpath=//div[3]/div[2]/div/div/table/tbody/tr/td/table/tbody/tr/td[2]/table/tbody/tr[2]/td[2]/em/button/img", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "d0a3b7b2-4ea0-4dda-86ee-aef5c7cf04f4",
+      "comment": "",
+      "command": "mouseOver",
+      "target": "css=#x-auto-29 .x-btn-image",
+      "targets": [
+        ["css=#x-auto-29 .x-btn-image", "css:finder"],
+        ["xpath=(//img[contains(@src,'https://adelb.univ-lyon1.fr/direct/gwtdirectplanning/clear.cache.gif')])[41]", "xpath:img"],
+        ["xpath=//table[@id='x-auto-29']/tbody/tr[2]/td[2]/em/button/img", "xpath:idRelative"],
+        ["xpath=//div[3]/div[2]/div/div/table/tbody/tr/td/table/tbody/tr/td[2]/table/tbody/tr[2]/td[2]/em/button/img", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "1baa2266-4dab-4a1a-903e-1e253504db61",
+      "comment": "",
+      "command": "click",
+      "target": "css=#x-auto-318 .x-btn-text",
+      "targets": [
+        ["css=#x-auto-318 .x-btn-text", "css:finder"],
+        ["xpath=(//button[@type='button'])[70]", "xpath:attributes"],
+        ["xpath=//table[@id='x-auto-318']/tbody/tr[2]/td[2]/em/button", "xpath:idRelative"],
+        ["xpath=//div[2]/div/div/div/div/div/div[2]/table/tbody/tr/td/table/tbody/tr/td[2]/table/tbody/tr[2]/td[2]/em/button", "xpath:position"],
+        ["xpath=//button[contains(.,'Générer URL')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "d3e6f005-2bc5-4ccc-9f37-ea369b29a3a4",
+      "comment": "",
+      "command": "click",
+      "target": "css=#x-auto-354 .x-btn-text",
+      "targets": [
+        ["css=#x-auto-354 .x-btn-text", "css:finder"],
+        ["xpath=(//button[@type='button'])[72]", "xpath:attributes"],
+        ["xpath=//table[@id='x-auto-354']/tbody/tr[2]/td[2]/em/button", "xpath:idRelative"],
+        ["xpath=//div[8]/div[2]/div/div/div/div/div/div[2]/table/tbody/tr/td/table/tbody/tr/td/table/tbody/tr[2]/td[2]/em/button", "xpath:position"],
+        ["xpath=//button[contains(.,'Fermer')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }]
+  }],
+  "suites": [{
+    "id": "52989f6a-53af-4369-a7da-f7afdb0bb440",
+    "name": "Default Suite",
+    "persistSession": false,
+    "parallel": false,
+    "timeout": 300,
+    "tests": []
+  }],
+  "urls": ["https://adelb.univ-lyon1.fr/"],
+  "plugins": []
+}
