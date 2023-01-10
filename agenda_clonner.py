@@ -1,11 +1,12 @@
-import time
 import json
+import time
 import copy
 from dotenv import dotenv_values
 import requests
 from selenium.webdriver.common.by import By
 from seleniumwire import webdriver
 from os.path import exists
+import jsonpickle
 
 
 def get_magic_auth_code():
@@ -93,14 +94,6 @@ def obj_to_dict(obj):
     return obj if obj is list else obj.__dict__
 
 
-driver = webdriver.Firefox()
-magic_auth_code = get_magic_auth_code()
-session = requests.Session()
-for cookie in driver.get_cookies():
-    print(cookie["name"], cookie["value"])
-    session.cookies.set(cookie["name"], cookie["value"])
-driver.quit()
-
 headers = {
     'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:108.0) Gecko/20100101 Firefox/108.0',
     'Accept': '*/*',
@@ -124,12 +117,10 @@ def get_everyone(parent, root_name, depth=0):
     global magic_auth_code
     if exists(f"data/{root_name}/{parent.name.replace('/', '_slash_')}.json"):
         with open(f"data/{root_name}/{parent.name.replace('/', '_slash_')}.json", "r") as file:
-            tmpjson = json.load(file)
-            tmpdirs = []
-            if type(tmpjson) is list:
-                tmpdirs.extend(copy.deepcopy([Dir(name=index["name"], id=int(index["id"]), opened=bool(index["opened"])) for index in tmpjson]))
-            else:
-                tmpdirs.append(Dir(name=tmpjson["name"], id=int(tmpjson["id"]), opened=bool(tmpjson["opened"])))
+            string = ""
+            for line in file.readlines():
+                string += line
+            tmpdirs = jsonpickle.decode(string)
     else:
         response = session.post(
             'https://adelb.univ-lyon1.fr/direct/gwtdirectplanning/DirectPlanningServiceProxy',
@@ -144,7 +135,7 @@ def get_everyone(parent, root_name, depth=0):
         if tmpdirs:
             tmpdirs.pop(0)
         with open(f"data/{root_name}/{parent.name.replace('/', '_slash_')}.json", "w") as file:
-            file.write(json.dumps(tmpdirs, default=obj_to_dict))
+            file.write(jsonpickle.encode(tmpdirs))
     if not parent.opened:
         for dir_index in range(len(tmpdirs)):
             tmpdirs[dir_index].children.extend(copy.deepcopy(get_everyone(tmpdirs[dir_index], root_name, depth + 1)))
@@ -152,9 +143,17 @@ def get_everyone(parent, root_name, depth=0):
         parent.opened = True
         print(f"data/{root_name}/{parent.name.replace('/', '_slash_')}.json")
         with open(f"data/{root_name}/{parent.name.replace('/', '_slash_')}.json", "w") as file:
-            file.write(json.dumps(tmpdirs, default=obj_to_dict))
+            file.write(jsonpickle.encode(tmpdirs))
     return tmpdirs
 
+
+driver = webdriver.Firefox()
+magic_auth_code = get_magic_auth_code()
+session = requests.Session()
+for cookie in driver.get_cookies():
+    print(cookie["name"], cookie["value"])
+    session.cookies.set(cookie["name"], cookie["value"])
+driver.quit()
 
 dirs = [
     Dir(name="trainee", id=-1),
@@ -168,9 +167,8 @@ for i in range(0, len(dirs)):
     print(f"Getting {dirs[i].name}")
     dirs[i].children.extend(copy.deepcopy(get_everyone(dirs[i], dirs[i].name)))
     dirs[i].opened = True
-    print(json.dumps(dirs, default=obj_to_dict))
     with open(f"data/{dirs[i].name.replace('/', '_slash_')}.json", "w") as f:
-        f.write(json.dumps(dirs[i], default=obj_to_dict))
+        f.write(jsonpickle.encode(dirs[i]))
 
 real_name = [
     "Etudiant (groupes)",
@@ -182,7 +180,11 @@ real_name = [
 with open('data/agenda_main.json', 'w') as f:
     final_dirs = []
     for directory in range(len(dirs)):
-        with open(f"data/{dirs[directory].name.replace('/', '_slash_')}.json", "w") as f_dir:
+        with open(f"data/{dirs[directory].name.replace('/', '_slash_')}.json", "r") as f_dir:
             final_dirs.append(dirs[directory])
             final_dirs[directory].name = real_name[directory]
-            dirs[directory].children.extend(copy.deepcopy(json.load(f_dir)))
+            string = ""
+            for line in f_dir.readlines():
+                string += line
+            dirs[directory].children.extend(copy.deepcopy(jsonpickle.decode(string)))
+    f.write(json.dumps(final_dirs, default=obj_to_dict))
