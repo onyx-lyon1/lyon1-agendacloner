@@ -5910,3 +5910,29 @@ JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 703: Error: Pha
 JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 703: Error: Phase "profile-before-change" is finished, it is too late to register completion condition "OS.File: flush I/O queued before profileBeforeChange"
 JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 703: Error: Phase "profile-before-change" is finished, it is too late to register completion condition "OS.File: flush I/O queued before profileBeforeChange"
 JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 703: Error: Phase "profile-before-change" is finished, it is too late to register completion condition "OS.File: flush I/O queued before profileBeforeChange"
+1673393054460	geckodriver	INFO	Listening on 127.0.0.1:57259
+1673393054464	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "--marionette" "--remote-debugging-port" "49787" "--remote-allow-hosts" "localhost" "-no-remote" "-profile" "/tmp/rust_mozprofilen6ehf2"
+kf.i18n: KLocalizedString: Using an empty domain, fix the code. msgid: "Mozilla Firefox" msgid_plural: "" msgctxt: ""
+[GFX1-]: glxtest: VA-API test failed: failed to initialise VAAPI connection.
+ATTENTION: default value of option mesa_glthread overridden by environment.
+ATTENTION: default value of option mesa_glthread overridden by environment.
+ATTENTION: default value of option mesa_glthread overridden by environment.
+ATTENTION: default value of option mesa_glthread overridden by environment.
+ATTENTION: default value of option mesa_glthread overridden by environment.
+ATTENTION: default value of option mesa_glthread overridden by environment.
+ATTENTION: default value of option mesa_glthread overridden by environment.
+ATTENTION: default value of option mesa_glthread overridden by environment.
+1673393056081	Marionette	INFO	Marionette enabled
+1673393056086	Marionette	INFO	Listening on port 42511
+Read port: 42511
+WebDriver BiDi listening on ws://127.0.0.1:49787
+1673393056245	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+1673393056281	RemoteAgent	INFO	Proxy settings initialised: {"proxyType":"manual","httpProxy":"127.0.0.1:39747","sslProxy":"127.0.0.1:39747"}
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /tmp/rust_mozprofilen6ehf2/search.json.mozlz4", (void 0)))
+DevTools listening on ws://127.0.0.1:49787/devtools/browser/2e8aa57a-62ed-4cfb-92b4-f57aa1443391
+JavaScript warning: https://cas.univ-lyon1.fr/cas/js/jquery-1.10.2.min.js, line 2: Using //@ to indicate sourceMappingURL pragmas is deprecated. Use //# instead
+console.warn: LoginRecipes: "Falling back to a synchronous message for: https://cas.univ-lyon1.fr."
+console.warn: LoginRecipes: "Falling back to a synchronous message for: https://cas.univ-lyon1.fr."
+Exiting due to channel error.
+Exiting due to channel error.
+Exiting due to channel error.

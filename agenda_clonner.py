@@ -1,6 +1,8 @@
 import json
 import time
 import copy
+from os import mkdir
+
 from dotenv import dotenv_values
 import requests
 from selenium.webdriver.common.by import By
@@ -117,10 +119,8 @@ def get_everyone(parent, root_name, depth=0):
     global magic_auth_code
     if exists(f"data/{root_name}/{parent.name.replace('/', '_slash_')}.json"):
         with open(f"data/{root_name}/{parent.name.replace('/', '_slash_')}.json", "r") as file:
-            string = ""
-            for line in file.readlines():
-                string += line
-            tmpdirs = jsonpickle.decode(string)
+            file_string = "".join(file)
+            tmpdirs = jsonpickle.decode(file_string)
     else:
         response = session.post(
             'https://adelb.univ-lyon1.fr/direct/gwtdirectplanning/DirectPlanningServiceProxy',
@@ -160,11 +160,16 @@ dirs = [
     Dir(name="instructor", id=-2),
     Dir(name="classroom", id=-3),
     Dir(name="equipment", id=-4),
-    Dir(name="category5", id=-5),
+    Dir(name="category5", id=-5)
 ]
+
+if not exists("data"):
+    mkdir("data")
 
 for i in range(0, len(dirs)):
     print(f"Getting {dirs[i].name}")
+    if not exists(f"data/{dirs[i].name}"):
+        mkdir(f"data/{dirs[i].name}")
     dirs[i].children.extend(copy.deepcopy(get_everyone(dirs[i], dirs[i].name)))
     dirs[i].opened = True
     with open(f"data/{dirs[i].name.replace('/', '_slash_')}.json", "w") as f:
@@ -183,8 +188,6 @@ with open('data/agenda_main.json', 'w') as f:
         with open(f"data/{dirs[directory].name.replace('/', '_slash_')}.json", "r") as f_dir:
             final_dirs.append(dirs[directory])
             final_dirs[directory].name = real_name[directory]
-            string = ""
-            for line in f_dir.readlines():
-                string += line
+            string = "".join(f_dir)
             dirs[directory].children.extend(copy.deepcopy(jsonpickle.decode(string)))
     f.write(json.dumps(final_dirs, default=obj_to_dict))
