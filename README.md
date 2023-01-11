@@ -14,3 +14,5 @@ echo "USERNAME=YOUR_USERNAME" > .env
 echo "PASSWORD=YOUR_PASSWORD" >> .env
 python agenda_clonner.py
 ```
+
+running remove_duplicates.py can be a great idea because I don't know why but some categories can be duplicated.

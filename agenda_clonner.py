@@ -1,4 +1,3 @@
-import json
 import time
 import copy
 from os import mkdir
@@ -11,8 +10,7 @@ from os.path import exists
 import jsonpickle
 
 
-def get_magic_auth_code():
-    global driver
+def get_magic_auth_code(driver):
     driver.get(
         "https://adelb.univ-lyon1.fr/direct/index.jsp?projectId=2&ShowPianoWeeks=true&days=0")
     driver.find_element(By.ID, "username").click()
@@ -29,7 +27,6 @@ def get_magic_auth_code():
             for t in tab:
                 if "YW" in t:
                     return t
-    print(driver.last_request)
     return str(driver.last_request.body).split("|")[-3]
 
 
@@ -47,6 +44,23 @@ class Dir:
 
     def __repr__(self):
         return str(self.__dict__)
+
+
+class SmallDir:
+    def __init__(self, name="", children=None, id=-1):
+        if children is None:
+            children = []
+        self.children = children
+        self.name = name
+        self.id = id
+
+    def from_dir(self, directory):
+        # function to import data from a Dir object
+        self.name = directory.name
+        self.id = directory.id
+        for child in directory.children:
+            self.children.append(copy.deepcopy(SmallDir().from_dir(child)))
+        return self
 
 
 def request_to_dirs(raw_data, root=False, parent_name=""):
@@ -113,10 +127,7 @@ headers = {
 }
 
 
-def get_everyone(parent, root_name, depth=0):
-    global headers
-    global session
-    global magic_auth_code
+def get_everyone(parent, root_name, session, request_headers, magic_auth_code, depth=0):
     if exists(f"data/{root_name}/{parent.name.replace('/', '_slash_')}.json"):
         with open(f"data/{root_name}/{parent.name.replace('/', '_slash_')}.json", "r") as file:
             file_string = "".join(file)
@@ -128,7 +139,7 @@ def get_everyone(parent, root_name, depth=0):
                 auth_code=magic_auth_code, dir_name=parent.name, dir_id=parent.id, depth=depth,
                 root=root_name).encode('utf-8'),
             cookies=session.cookies,
-            headers=headers,
+            headers=request_headers,
 
         )
         tmpdirs = request_to_dirs(raw_data=response.text, parent_name="" if depth == 0 else parent.name)
@@ -138,7 +149,9 @@ def get_everyone(parent, root_name, depth=0):
             file.write(jsonpickle.encode(tmpdirs))
     if not parent.opened:
         for dir_index in range(len(tmpdirs)):
-            tmpdirs[dir_index].children.extend(copy.deepcopy(get_everyone(tmpdirs[dir_index], root_name, depth + 1)))
+            tmpdirs[dir_index].children.extend(copy.deepcopy(
+                get_everyone(tmpdirs[dir_index], root_name=root_name, depth=depth + 1, magic_auth_code=magic_auth_code,
+                             session=session, request_headers=request_headers)))
             tmpdirs[dir_index].opened = True
         parent.opened = True
         print(f"data/{root_name}/{parent.name.replace('/', '_slash_')}.json")
@@ -147,47 +160,52 @@ def get_everyone(parent, root_name, depth=0):
     return tmpdirs
 
 
-driver = webdriver.Firefox()
-magic_auth_code = get_magic_auth_code()
-session = requests.Session()
-for cookie in driver.get_cookies():
-    print(cookie["name"], cookie["value"])
-    session.cookies.set(cookie["name"], cookie["value"])
-driver.quit()
+def main():  # sourcery skip: for-index-replacement, remove-zero-from-range
+    driver = webdriver.Firefox()
+    magic_auth_code = get_magic_auth_code(driver)
+    session = requests.Session()
+    for cookie in driver.get_cookies():
+        print(cookie["name"], cookie["value"])
+        session.cookies.set(cookie["name"], cookie["value"])
+    driver.quit()
 
-dirs = [
-    Dir(name="trainee", id=-1),
-    Dir(name="instructor", id=-2),
-    Dir(name="classroom", id=-3),
-    Dir(name="equipment", id=-4),
-    Dir(name="category5", id=-5)
-]
+    dirs = [
+        Dir(name="trainee", id=-1),
+        Dir(name="instructor", id=-2),
+        Dir(name="classroom", id=-3),
+        Dir(name="equipment", id=-4),
+        Dir(name="category5", id=-5)
+    ]
 
-if not exists("data"):
-    mkdir("data")
+    if not exists("data"):
+        mkdir("data")
 
-for i in range(0, len(dirs)):
-    print(f"Getting {dirs[i].name}")
-    if not exists(f"data/{dirs[i].name}"):
-        mkdir(f"data/{dirs[i].name}")
-    dirs[i].children.extend(copy.deepcopy(get_everyone(dirs[i], dirs[i].name)))
-    dirs[i].opened = True
-    with open(f"data/{dirs[i].name.replace('/', '_slash_')}.json", "w") as f:
-        f.write(jsonpickle.encode(dirs[i]))
+    for i in range(0, len(dirs)):
+        print(f"Getting {dirs[i].name}")
+        if not exists(f"data/{dirs[i].name}"):
+            mkdir(f"data/{dirs[i].name}")
+        dirs[i].children.extend(copy.deepcopy(
+            get_everyone(parent=dirs[i], root_name=dirs[i].name, depth=0, magic_auth_code=magic_auth_code,
+                         session=session, request_headers=headers)))
+        dirs[i].opened = True
+        with open(f"data/{dirs[i].name.replace('/', '_slash_')}.json", "w") as f:
+            f.write(jsonpickle.encode(dirs[i]))
 
-real_name = [
-    "Etudiant (groupes)",
-    "Enseignants",
-    "Salles",
-    "Etudiants (individus)",
-    "Séquences"
-]
-with open('data/agenda_main.json', 'w') as f:
-    final_dirs = []
-    for directory in range(len(dirs)):
-        with open(f"data/{dirs[directory].name.replace('/', '_slash_')}.json", "r") as f_dir:
-            final_dirs.append(dirs[directory])
+    real_name = [
+        "Etudiant (groupes)",
+        "Enseignants",
+        "Salles",
+        "Etudiants (individus)",
+        "Séquences"
+    ]
+    with open('data/agenda_main.json', 'w') as f:
+        final_dirs = []
+        for directory in range(len(dirs)):
+            print("cleaning", dirs[directory].name)
+            final_dirs.append(copy.deepcopy(SmallDir().from_dir(dirs[directory])))
             final_dirs[directory].name = real_name[directory]
-            string = "".join(f_dir)
-            dirs[directory].children.extend(copy.deepcopy(jsonpickle.decode(string)))
-    f.write(json.dumps(final_dirs, default=obj_to_dict))
+        print("writing final file : agenda_main.json")
+        f.write(jsonpickle.encode(final_dirs, unpicklable=False, make_refs=False))
+
+
+main()
