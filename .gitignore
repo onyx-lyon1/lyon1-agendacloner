@@ -3,3 +3,4 @@ geckodriver.log
 data/
 venv/
 .idea/
+encryptor/*.json
