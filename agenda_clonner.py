@@ -142,7 +142,8 @@ def get_everyone(parent, root_name, session, request_headers, magic_auth_code, d
             headers=request_headers,
 
         )
-        tmpdirs = request_to_dirs(raw_data=response.text, parent_name="" if depth == 0 else parent.name)
+        tmpdirs = request_to_dirs(
+            raw_data=response.text, parent_name="" if depth == 0 else parent.name)
         if tmpdirs:
             tmpdirs.pop(0)
         with open(f"data/{root_name}/{parent.name.replace('/', '_slash_')}.json", "w") as file:
@@ -202,7 +203,8 @@ def main():  # sourcery skip: for-index-replacement, remove-zero-from-range
         final_dirs = []
         for directory in range(len(dirs)):
             print("cleaning", dirs[directory].name)
-            final_dirs.append(copy.deepcopy(SmallDir().from_dir(dirs[directory])))
+            final_dirs.append(copy.deepcopy(
+                SmallDir().from_dir(dirs[directory])))
             final_dirs[directory].name = real_name[directory]
         print("writing final file : agenda_main.json")
         f.write(jsonpickle.encode(final_dirs, unpicklable=False, make_refs=False))

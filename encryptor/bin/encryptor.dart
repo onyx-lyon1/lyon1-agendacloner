@@ -5,16 +5,20 @@ import 'dart:io';
 import 'package:encrypt/encrypt.dart';
 
 void main(List<String> arguments) async {
-  //encrypt data
+  //open data
   final plainText = File('agenda_ids.json').readAsStringSync();
+  //compress data
+  final enCodedJson = utf8.encode(plainText);
+  final gZipJson = gzip.encode(enCodedJson);
+  final base64Json = base64.encode(gZipJson);
+  File("agenda_ids.json.compressed").writeAsStringSync(base64Json);
+
+  //encrypt data
   final key = Key.fromBase64(File('key.txt').readAsStringSync());
   var iv = IV.fromLength(16);
   var encrypter = Encrypter(AES(key));
-  var encrypted = encrypter.encrypt(plainText, iv: iv);
+  var encrypted = encrypter.encrypt(base64Json, iv: iv);
   File("agenda_ids.json.enc").writeAsStringSync(encrypted.base64);
-  Stopwatch stopwatch = new Stopwatch()..start();
-  var decrypted = encrypter.decrypt(encrypted, iv: iv);
-  print('aesdecrypt() executed in ${stopwatch.elapsed}');
 
   //decrypt data
   // final encrypted = File('agenda_ids.json.enc').readAsStringSync();

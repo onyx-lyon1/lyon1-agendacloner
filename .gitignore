@@ -4,3 +4,4 @@ data/
 venv/
 .idea/
 encryptor/*.json
+encryptor/*.compressed
