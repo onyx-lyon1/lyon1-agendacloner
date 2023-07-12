@@ -1,18 +1,39 @@
-# lyon1-agendaClonner
+# 📅 lyon1-agendaClonner
 
-This project is completly experimental and not stable. I'm not responsible for any damage it may cause. And take care of rgpd and privacy.
+A Python project for cloning Lyon 1 ADE (Agenda) and generating the ICS URL for each category.
 
-It enables you to completly clone the lyon1 ade agenda tree to get the id of all categories.
+⚠️ **Disclaimer:** This project is experimental and not stable. The developer is not responsible for any damage it may cause. Please ensure you handle RGPD and privacy concerns appropriately.
 
-With this id, you can generate the ics url of the agenda.
+## ✨ Features
 
-## Usage
+- Clone the Lyon 1 ADE agenda tree to retrieve category IDs.
+- Generate ICS URLs for each category.
+
+## ⚙️ Installation
+
+1. Install the required dependencies by running the following command:
 
 ```bash
 pip install -r requirements.txt
+```
+
+2. Create a `.env` file in the project directory and add your Lyon 1 ADE credentials:
+
+```bash
 echo "USERNAME=YOUR_USERNAME" > .env
 echo "PASSWORD=YOUR_PASSWORD" >> .env
+```
+
+## 🔒 Usage
+
+To clone the Lyon 1 ADE agenda and generate the ICS URLs for each category, run the following command:
+
+```bash
 python agenda_clonner.py
 ```
 
-running remove_duplicates.py can be a great idea because I don't know why but some categories can be duplicated.
+It is recommended to run `remove_duplicates.py` afterwards to remove any duplicated categories:
+
+```bash
+python remove_duplicates.py
+```
