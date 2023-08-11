@@ -22,10 +22,10 @@ def get_magic_auth_code(driver):
     driver.find_element(By.NAME, "submit").click()
     time.sleep(3)
     for request in driver.requests:
-        if "YW" in str(request.body) and "|" in str(request.body):
+        if "Yn" in str(request.body) and "|" in str(request.body):
             tab = str(request.body).split("|")
             for t in tab:
-                if "YW" in t:
+                if "Yn" in t:
                     return t
     return str(driver.last_request.body).split("|")[-3]
 
@@ -93,7 +93,7 @@ def request_to_dirs(raw_data, root=False, parent_name=""):
 
 
 def dir_to_request(auth_code, dir_name, dir_id, depth, root):
-    begin = '7|0|20|https://adelb.univ-lyon1.fr/direct/gwtdirectplanning/|D299C8C3CA21CA5E6AFCED14CFFB2A29|com' \
+    begin = '7|0|20|https://adelb.univ-lyon1.fr/direct/gwtdirectplanning/|067818807965393FC5DCF6AECC2CA8EC|com' \
             '.adesoft.gwt.directplan.client.rpc.DirectPlanningServiceProxy|method4getChildren|J|java.lang.String' \
             '/2004016611|com.adesoft.gwt.directplan.client.ui.tree.TreeResourceConfig/2234901663|{"'
     end = f'[0][0]|[I/2970817851|java.util.LinkedHashMap/3008245022|COLOR|com.adesoft.gwt.core.client.rpc.config' \
@@ -175,7 +175,10 @@ def main():  # sourcery skip: for-index-replacement, remove-zero-from-range
         Dir(name="instructor", id=-2),
         Dir(name="classroom", id=-3),
         Dir(name="equipment", id=-4),
-        Dir(name="category5", id=-5)
+        Dir(name="category5", id=-5),
+        Dir(name="category6", id=-6),
+        Dir(name="category7", id=-7),
+        Dir(name="category8", id=-8)
     ]
 
     if not exists("data"):
@@ -193,11 +196,14 @@ def main():  # sourcery skip: for-index-replacement, remove-zero-from-range
             f.write(jsonpickle.encode(dirs[i]))
 
     real_name = [
-        "Etudiant (groupes)",
-        "Enseignants",
-        "Salles",
-        "Etudiants (individus)",
-        "Séquences"
+        "Trainees",
+        "Trainers",
+        "Rooms",
+        "Equipment",
+        "Category5",
+        "Category6",
+        "Category7",
+        "Category8"
     ]
     with open('data/agenda_main.json', 'w') as f:
         final_dirs = []
