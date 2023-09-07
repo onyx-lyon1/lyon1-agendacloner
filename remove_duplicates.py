@@ -1,8 +1,6 @@
-import collections
 import copy
 import json
 import os
-
 
 files = [
     'agenda_main.json',
@@ -11,9 +9,15 @@ files = [
     'instructor.json',
     'classroom.json',
     'category5.json',
+    'category6.json',
+    'category7.json',
+    'category8.json',
 ]
 
 dirs = [
+    'category8',
+    'category7',
+    'category6',
     'category5',
     'classroom',
     'equipment',
@@ -22,23 +26,22 @@ dirs = [
 ]
 
 
-def clean_duplicate(dirs):
-    if type(dirs) is not list:
-        copied = dirs
+def clean_duplicate(directories):
+    if type(directories) is not list:
+        copied = directories
         copied['children'] = clean_duplicate(copy.deepcopy(copied['children']))
     else:
         count = {}
-        for dir in dirs:
-            count[str(dir["id"])] = count.get(str(dir["id"]), 0) + 1
+        for directory in directories:
+            count[str(directory["id"])] = count.get(str(directory["id"]), 0) + 1
         copied = []
-        for dir in dirs:
-            if count[str(dir["id"])] > 1:
-                count[str(dir["id"])] -= 1
+        for directory in directories:
+            if count[str(directory["id"])] > 1:
+                count[str(directory["id"])] -= 1
             else:
-                copied.append(copy.deepcopy(dir))
-        for dir in range(len(copied)):
-            copied[dir]['children'] = clean_duplicate(
-                copy.deepcopy(copied[dir]['children']))
+                copied.append(copy.deepcopy(directory))
+        for item in copied:
+            item['children'] = clean_duplicate(copy.deepcopy(item['children']))
     return copied
 
 
@@ -51,7 +54,6 @@ for dir in dirs:
         clean_data = clean_duplicate(data)
         with open(f'data/{dir}/{file}', 'w') as f:
             json.dump(clean_data, f)
-
 
 for file in files:
     print(file)

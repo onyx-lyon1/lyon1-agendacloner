@@ -20,12 +20,13 @@ def get_magic_auth_code(driver):
     driver.find_element(By.ID, "password").send_keys(
         dotenv_values(".env")["PASSWORD"])
     driver.find_element(By.NAME, "submit").click()
-    time.sleep(3)
+    time.sleep(5)
     for request in driver.requests:
-        if "Yn" in str(request.body) and "|" in str(request.body):
+        if "|" in str(request.body):
             tab = str(request.body).split("|")
             for t in tab:
-                if "Yn" in t:
+                # check that it is 7 characters long and that there is no special characters
+                if len(t) == 7 and t.isalnum():
                     return t
     return str(driver.last_request.body).split("|")[-3]
 
@@ -196,14 +197,14 @@ def main():  # sourcery skip: for-index-replacement, remove-zero-from-range
             f.write(jsonpickle.encode(dirs[i]))
 
     real_name = [
-        "Trainees",
-        "Trainers",
-        "Rooms",
-        "Equipment",
-        "Category5",
-        "Category6",
-        "Category7",
-        "Category8"
+        "Etudiants (groupes)",
+        "Enseignants",
+        "Salles",
+        "Assiduité",
+        "Séquences",
+        "Categorie6",
+        "Categorie7",
+        "Categorie8"
     ]
     with open('data/agenda_main.json', 'w') as f:
         final_dirs = []
