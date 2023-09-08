@@ -9,10 +9,9 @@ from seleniumwire import webdriver
 from os.path import exists
 import jsonpickle
 
-
 def get_magic_auth_code(driver):
     driver.get(
-        "https://adelb.univ-lyon1.fr/direct/index.jsp?projectId=2&ShowPianoWeeks=true&days=0")
+        "https://adelb.univ-lyon1.fr/direct/index.jsp?projectId=3&ShowPianoWeeks=true&days=0")
     driver.find_element(By.ID, "username").click()
     driver.find_element(By.ID, "username").send_keys(
         dotenv_values(".env")["USERNAME"])
@@ -120,7 +119,7 @@ headers = {
     'X-GWT-Module-Base': 'https://adelb.univ-lyon1.fr/direct/gwtdirectplanning/',
     'Origin': 'https://adelb.univ-lyon1.fr',
     'Connection': 'keep-alive',
-    'Referer': 'https://adelb.univ-lyon1.fr/direct/index.jsp?projectId=2&ShowPianoWeeks=true&days=0&ticket=ST-3100507'
+    'Referer': 'https://adelb.univ-lyon1.fr/direct/index.jsp?projectId=3&ShowPianoWeeks=true&days=0&ticket=ST-3100507'
                '-cRkd5pGuT37xEZrFrNkK-cas.univ-lyon1.fr',
     'Sec-Fetch-Dest': 'empty',
     'Sec-Fetch-Mode': 'cors',
@@ -140,8 +139,7 @@ def get_everyone(parent, root_name, session, request_headers, magic_auth_code, d
                 auth_code=magic_auth_code, dir_name=parent.name, dir_id=parent.id, depth=depth,
                 root=root_name).encode('utf-8'),
             cookies=session.cookies,
-            headers=request_headers,
-
+            headers=request_headers
         )
         tmpdirs = request_to_dirs(
             raw_data=response.text, parent_name="" if depth == 0 else parent.name)
@@ -168,7 +166,8 @@ def main():  # sourcery skip: for-index-replacement, remove-zero-from-range
     session = requests.Session()
     for cookie in driver.get_cookies():
         print(cookie["name"], cookie["value"])
-        session.cookies.set(cookie["name"], cookie["value"])
+        if cookie["name"] == "JSESSIONID":
+            session.cookies.set(cookie["name"], cookie["value"])
     driver.quit()
 
     dirs = [
