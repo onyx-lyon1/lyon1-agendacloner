@@ -1,4 +1,3 @@
-import time
 import copy
 from os import mkdir
 
@@ -59,8 +58,11 @@ class SmallDir:
         # function to import data from a Dir object
         self.name = directory.name
         self.identifier = directory.identifier
-        for child in directory.children:
-            self.children.append(copy.deepcopy(SmallDir().from_dir(child)))
+        if directory.children is not None:
+            for child in directory.children:
+                self.children.append(copy.deepcopy(SmallDir().from_dir(child)))
+        else:
+            self.children = directory.children
         return self
 
 
@@ -83,7 +85,7 @@ def request_to_dirs(raw_data, root=False, parent_name=""):
     return tmp_dirs
 
 
-def dir_to_request(auth_code, dir_name, dir_id, depth, root):
+def dir_to_request(auth_code, dir_name, dir_id, depth, root, index):
     begin = '7|0|20|https://adelb.univ-lyon1.fr/direct/gwtdirectplanning/|067818807965393FC5DCF6AECC2CA8EC|com' \
             '.adesoft.gwt.directplan.client.rpc.DirectPlanningServiceProxy|method4getChildren|J|java.lang.String' \
             '/2004016611|com.adesoft.gwt.directplan.client.ui.tree.TreeResourceConfig/2234901663|{"'
@@ -91,10 +93,10 @@ def dir_to_request(auth_code, dir_name, dir_id, depth, root):
           f'.OutputField/870745015|LabelColor||com.adesoft.gwt.core.client.rpc.config.FieldType/1797283245|NAME' \
           f'|LabelName|java.util.ArrayList/4159755760|com.extjs.gxt.ui.client.data.SortInfo/1143517771|com.extjs.gxt' \
           f'.ui.client.Style$SortDir/3873584144|1|2|3|4|3|5|6|7|' \
-          f'{auth_code}|8|7|0|9|2|-1|-1|10|0|2|6|11|12|0|13|11|14|15|11|0|0|6|16|12|0|17|16|14|15|4|0|0|18|0|18|0|19' \
+          f'{auth_code}|8|7|0|9|2|{-1 if index==0 else index}|{-1 if index==0 else index + 149}|10|0|2|6|11|12|0|13|11|14|15|11|0|0|6|16|12|0|17|16|14|15|4|0|0|18|0|18|0|19' \
           f'|20|1|16|18|0|'
-    return f'{begin}{str(dir_id)}""true""{str(depth)}""-1""0""0""0""false"[1]{"{"}"StringField""NAME""LabelName""' \
-           f'{dir_name.split(".")[-1]}""false""false""{("" if depth == 0 else dir_name)}""{root}""1""0"{end}'
+    return f'{begin}{str(dir_id)}""true""{str(depth)}""-1""0""{index}""0""false"[1]{"{"}"StringField""NAME""LabelName' \
+           f'""{dir_name.split(".")[-1]}""false""false""{("" if depth == 0 else dir_name)}""{root}""1""0"{end}'
 
 
 def obj_to_dict(obj):
@@ -124,25 +126,33 @@ def get_everyone(parent, root_name, session, request_headers, magic_auth_code, d
             file_string = "".join(file)
             tmpdirs = jsonpickle.decode(file_string)
     else:
-        response = session.post(
-            'https://adelb.univ-lyon1.fr/direct/gwtdirectplanning/DirectPlanningServiceProxy',
-            data=dir_to_request(
-                auth_code=magic_auth_code, dir_name=parent.name, dir_id=parent.id, depth=depth,
-                root=root_name).encode('utf-8'),
-            cookies=session.cookies,
-            headers=request_headers
-        )
-        tmpdirs = request_to_dirs(
-            raw_data=response.text, parent_name="" if depth == 0 else parent.name)
-        if tmpdirs:
-            tmpdirs.pop(0)
-        with open(f"data/{root_name}/{parent.name.replace('/', '_slash_')}.json", "w") as file:
-            file.write(jsonpickle.encode(tmpdirs))
+        index = 0
+        tmpdirs = []
+        while True:
+            response = session.post(
+                'https://adelb.univ-lyon1.fr/direct/gwtdirectplanning/DirectPlanningServiceProxy',
+                data=dir_to_request(
+                    auth_code=magic_auth_code, dir_name=parent.name, dir_id=parent.identifier, depth=depth,
+                    root=root_name, index=index),
+                cookies=session.cookies,
+                headers=request_headers
+            )
+            tmpdirs.extend(request_to_dirs(
+                raw_data=response.text, parent_name="" if depth == 0 else parent.name, root=depth == 0))
+            # if tmpdirs and not depth == 0:
+            #     tmpdirs.pop(index)
+            with open(f"data/{root_name}/{parent.name.replace('/', '_slash_')}.json", "w") as file:
+                file.write(jsonpickle.encode(tmpdirs))
+            if len(tmpdirs) - index < 149:
+                break
+            index = len(tmpdirs)
     if not parent.opened:
         for dir_index in range(len(tmpdirs)):
-            tmpdirs[dir_index].children.extend(copy.deepcopy(
-                get_everyone(tmpdirs[dir_index], root_name=root_name, depth=depth + 1, magic_auth_code=magic_auth_code,
-                             session=session, request_headers=request_headers)))
+            if tmpdirs[dir_index].children is not None:
+                children = get_everyone(tmpdirs[dir_index], root_name=root_name, depth=depth + 1,
+                                        magic_auth_code=magic_auth_code, session=session,
+                                        request_headers=request_headers)
+                tmpdirs[dir_index].children.extend(copy.deepcopy(children))
             tmpdirs[dir_index].opened = True
         parent.opened = True
         print(f"data/{root_name}/{parent.name.replace('/', '_slash_')}.json")
@@ -162,29 +172,15 @@ def main():  # sourcery skip: for-index-replacement, remove-zero-from-range
     driver.quit()
 
     dirs = [
-        Dir(name="trainee", id=-1),
-        Dir(name="instructor", id=-2),
-        Dir(name="classroom", id=-3),
-        Dir(name="equipment", id=-4),
-        Dir(name="category5", id=-5),
-        Dir(name="category6", id=-6),
-        Dir(name="category7", id=-7),
-        Dir(name="category8", id=-8)
+        Dir(name="trainee", identifier=-1, children=[]),
+        Dir(name="instructor", identifier=-2, children=[]),
+        Dir(name="classroom", identifier=-3, children=[]),
+        Dir(name="equipment", identifier=-4, children=[]),
+        Dir(name="category5", identifier=-5, children=[]),
+        Dir(name="category6", identifier=-6, children=[]),
+        Dir(name="category7", identifier=-7, children=[]),
+        Dir(name="category8", identifier=-8, children=[])
     ]
-
-    if not exists("data"):
-        mkdir("data")
-
-    for i in range(0, len(dirs)):
-        print(f"Getting {dirs[i].name}")
-        if not exists(f"data/{dirs[i].name}"):
-            mkdir(f"data/{dirs[i].name}")
-        dirs[i].children.extend(copy.deepcopy(
-            get_everyone(parent=dirs[i], root_name=dirs[i].name, depth=0, magic_auth_code=magic_auth_code,
-                         session=session, request_headers=headers)))
-        dirs[i].opened = True
-        with open(f"data/{dirs[i].name.replace('/', '_slash_')}.json", "w") as f:
-            f.write(jsonpickle.encode(dirs[i]))
 
     real_name = [
         "Etudiants (groupes)",
@@ -196,6 +192,22 @@ def main():  # sourcery skip: for-index-replacement, remove-zero-from-range
         "Categorie7",
         "Categorie8"
     ]
+
+    if not exists("data"):
+        mkdir("data")
+
+    for i in range(0, len(dirs)):
+        print(f"Getting {dirs[i].name}")
+        if not exists(f"data/{dirs[i].name}"):
+            mkdir(f"data/{dirs[i].name}")
+        if dirs[i].children is not None:
+            dirs[i].children.extend(copy.deepcopy(
+                get_everyone(parent=dirs[i], root_name=dirs[i].name, depth=0, magic_auth_code=magic_auth_code,
+                             session=session, request_headers=headers)))
+        dirs[i].opened = True
+        with open(f"data/{dirs[i].name.replace('/', '_slash_')}.json", "w") as f:
+            f.write(jsonpickle.encode(dirs[i]))
+
     with open('data/agenda_main.json', 'w') as f:
         final_dirs = []
         for directory in range(len(dirs)):
