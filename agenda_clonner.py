@@ -8,6 +8,8 @@ from selenium.webdriver.common.by import By
 from seleniumwire import webdriver
 from os.path import exists
 import jsonpickle
+import re
+
 
 def get_magic_auth_code(driver):
     driver.get(
@@ -31,12 +33,11 @@ def get_magic_auth_code(driver):
 
 
 class Dir:
-    def __init__(self, name="", children=None, id=-1, opened=False):
+    def __init__(self, name="", children=None, identifier=-1, opened=False):
         self.children = []
-        if children is not None:
-            self.children = children
+        self.children = children
         self.name = name
-        self.id = id
+        self.identifier = identifier
         self.opened = opened
 
     def __str__(self):
@@ -47,48 +48,38 @@ class Dir:
 
 
 class SmallDir:
-    def __init__(self, name="", children=None, id=-1):
+    def __init__(self, name="", children=None, identifier=-1):
         if children is None:
             children = []
         self.children = children
         self.name = name
-        self.id = id
+        self.identifier = identifier
 
     def from_dir(self, directory):
         # function to import data from a Dir object
         self.name = directory.name
-        self.id = directory.id
+        self.identifier = directory.identifier
         for child in directory.children:
             self.children.append(copy.deepcopy(SmallDir().from_dir(child)))
         return self
 
 
 def request_to_dirs(raw_data, root=False, parent_name=""):
-    fields = raw_data.split("{")
-    fields = fields[3:]
+    # fields = raw_data.split("{")
+    fields = re.findall(r'(\{\\"\d+\\".*?)(?=\{\\"\d|$)', raw_data)
+    fields = fields[2 if not root else 1:]
     tmp_dirs = []
-    names = []
-    ids = []
     for field in fields:
         subfields = field.split("\\\"")
-        if (
-                subfields[1] == "StringField"
-                and subfields[3] == "NAME"
-                and subfields[5] == "LabelName"
-        ):
-            if parent_name != "" and field != fields[0]:
-                names.append(f"{parent_name}.{subfields[7]}")
+        if len(subfields) > 3:
+            if parent_name != "":
+                name = parent_name + "." + subfields[subfields.index('LabelName') + 2]  # subfields[35]
             else:
-                names.append(subfields[7])
-        elif subfields[1] != "ColorField":
-            ids.append(0 if subfields[1] == "" else int(subfields[1]))
-    if not root and names:
-        tmp_dirs.append(Dir(name=names.pop(0)))
-    tmp_dirs.extend(
-        Dir(name=names[name_id], id=ids[name_id])
-        for name_id in range(len(names))
-        if name_id < len(ids)
-    )
+                name = subfields[subfields.index('LabelName') + 2]  # subfields[35]
+            # id= check after
+            children = None if subfields[3] == 'false' else []
+            identifier = subfields[1]
+            tmp_dirs.append(Dir(name=name, children=children, identifier=identifier))
     return tmp_dirs
 
 
