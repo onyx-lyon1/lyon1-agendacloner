@@ -13,7 +13,7 @@ import re
 
 def get_magic_auth_code(driver):
     driver.get(
-        "https://adelb.univ-lyon1.fr/direct/index.jsp?projectId=3&ShowPianoWeeks=true&days=0")
+        "https://adelb.univ-lyon1.fr/direct/index.jsp?projectId=3&ShowPianoWeeks=true&days=2")
     driver.find_element(By.ID, "username").click()
     driver.find_element(By.ID, "username").send_keys(
         dotenv_values(".env")["USERNAME"])
@@ -21,13 +21,13 @@ def get_magic_auth_code(driver):
     driver.find_element(By.ID, "password").send_keys(
         dotenv_values(".env")["PASSWORD"])
     driver.find_element(By.NAME, "submit").click()
-    time.sleep(5)
+    input("press enter when the connection is completed")
     for request in driver.requests:
         if "|" in str(request.body):
             tab = str(request.body).split("|")
             for t in tab:
                 # check that it is 7 characters long and that there is no special characters
-                if len(t) == 7 and t.isalnum():
+                if len(t) == 7:
                     return t
     return str(driver.last_request.body).split("|")[-3]
 
