@@ -1,4 +1,6 @@
 import copy
+import json
+import os
 from os import mkdir
 
 from dotenv import dotenv_values
@@ -93,7 +95,7 @@ def dir_to_request(auth_code, dir_name, dir_id, depth, root, index):
           f'.OutputField/870745015|LabelColor||com.adesoft.gwt.core.client.rpc.config.FieldType/1797283245|NAME' \
           f'|LabelName|java.util.ArrayList/4159755760|com.extjs.gxt.ui.client.data.SortInfo/1143517771|com.extjs.gxt' \
           f'.ui.client.Style$SortDir/3873584144|1|2|3|4|3|5|6|7|' \
-          f'{auth_code}|8|7|0|9|2|{-1 if index==0 else index}|{-1 if index==0 else index + 149}|10|0|2|6|11|12|0|13|11|14|15|11|0|0|6|16|12|0|17|16|14|15|4|0|0|18|0|18|0|19' \
+          f'{auth_code}|8|7|0|9|2|{-1 if index == 0 else index}|{-1 if index == 0 else index + 149}|10|0|2|6|11|12|0|13|11|14|15|11|0|0|6|16|12|0|17|16|14|15|4|0|0|18|0|18|0|19' \
           f'|20|1|16|18|0|'
     return f'{begin}{str(dir_id)}""true""{str(depth)}""-1""0""{index}""0""false"[1]{"{"}"StringField""NAME""LabelName' \
            f'""{dir_name.split(".")[-1]}""false""false""{("" if depth == 0 else dir_name)}""{root}""1""0"{end}'
@@ -161,6 +163,27 @@ def get_everyone(parent, root_name, session, request_headers, magic_auth_code, d
     return tmpdirs
 
 
+def clean_duplicate(directories):
+    if type(directories) is not list:
+        copied = directories
+        if copied['children'] is not None:
+            copied['children'] = clean_duplicate(copy.deepcopy(copied['children']))
+    else:
+        count = {}
+        for directory in directories:
+            count[str(directory["identifier"])] = count.get(str(directory["identifier"]), 0) + 1
+        copied = []
+        for directory in directories:
+            if count[str(directory["identifier"])] > 1:
+                count[str(directory["identifier"])] -= 1
+            else:
+                copied.append(copy.deepcopy(directory))
+        for item in copied:
+            if item['children'] is not None:
+                item['children'] = clean_duplicate(copy.deepcopy(item['children']))
+    return copied
+
+
 def main():  # sourcery skip: for-index-replacement, remove-zero-from-range
     driver = webdriver.Firefox()
     magic_auth_code = get_magic_auth_code(driver)
@@ -218,5 +241,25 @@ def main():  # sourcery skip: for-index-replacement, remove-zero-from-range
         print("writing final file : agenda_main.json")
         f.write(jsonpickle.encode(final_dirs, unpicklable=False, make_refs=False))
 
+
+    print("lets remove duplicates !")
+    for directory in dirs:
+        sub_files = os.listdir(f'data/{directory.name}')
+        for file in sub_files:
+            print(file)
+            with open(f'data/{directory.name}/{file}', 'r') as f:
+                data = json.load(f)
+            clean_data = clean_duplicate(data)
+            with open(f'data/{directory.name}/{file}', 'w') as f:
+                json.dump(clean_data, f)
+    files = [x.name+".json" for x in dirs]
+    files.append("agenda_main.json")
+    for file in files:
+        print(file)
+        with open(f'data/{file}', 'r') as f:
+            data = json.load(f)
+        clean_data = clean_duplicate(data)
+        with open(f'data/{file}', 'w') as f:
+            json.dump(clean_data, f)
 
 main()

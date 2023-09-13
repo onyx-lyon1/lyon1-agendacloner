@@ -31,9 +31,3 @@ To clone the Lyon 1 ADE agenda and generate the ICS URLs for each category, run 
 ```bash
 python agenda_clonner.py
 ```
-
-It is recommended to run `remove_duplicates.py` afterwards to remove any duplicated categories:
-
-```bash
-python remove_duplicates.py
-```
