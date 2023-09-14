@@ -29,5 +29,5 @@ echo "PASSWORD=YOUR_PASSWORD" >> .env
 To clone the Lyon 1 ADE agenda and generate the ICS URLs for each category, run the following command:
 
 ```bash
-python agenda_clonner.py
+python agenda_cloner.py
 ```
