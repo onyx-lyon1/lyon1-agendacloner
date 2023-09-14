@@ -1,4 +1,4 @@
-# 📅 lyon1-agendaClonner
+# 📅 lyon1-agendaCloner
 
 A Python project for cloning Lyon 1 ADE (Agenda) and generating the ICS URL for each category.
 
