@@ -10,6 +10,7 @@ from seleniumwire import webdriver
 from os.path import exists
 import jsonpickle
 import re
+from classes import SmallDir, Dir
 
 
 def get_magic_auth_code(driver):
@@ -31,41 +32,6 @@ def get_magic_auth_code(driver):
                 if len(t) == 7:
                     return t
     return str(driver.last_request.body).split("|")[-3]
-
-
-class Dir:
-    def __init__(self, name="", children=None, identifier=-1, opened=False):
-        self.children = []
-        self.children = children
-        self.name = name
-        self.identifier = identifier
-        self.opened = opened
-
-    def __str__(self):
-        return str(self.__dict__)
-
-    def __repr__(self):
-        return str(self.__dict__)
-
-
-class SmallDir:
-    def __init__(self, name="", children=None, identifier=-1):
-        if children is None:
-            children = []
-        self.children = children
-        self.name = name
-        self.identifier = identifier
-
-    def from_dir(self, directory):
-        # function to import data from a Dir object
-        self.name = directory.name
-        self.identifier = directory.identifier
-        if directory.children is not None:
-            for child in directory.children:
-                self.children.append(copy.deepcopy(SmallDir().from_dir(child)))
-        else:
-            self.children = directory.children
-        return self
 
 
 def request_to_dirs(raw_data, root=False, parent_name=""):
@@ -238,7 +204,7 @@ def main():  # sourcery skip: for-index-replacement, remove-zero-from-range
             final_dirs.append(copy.deepcopy(
                 SmallDir().from_dir(dirs[directory])))
             final_dirs[directory].name = real_name[directory]
-        print("writing final file : agenda_main.json")
+        print("writing final file : 2.json")
         f.write(jsonpickle.encode(final_dirs, unpicklable=False, make_refs=False))
 
 
@@ -253,7 +219,7 @@ def main():  # sourcery skip: for-index-replacement, remove-zero-from-range
             with open(f'data/{directory.name}/{file}', 'w') as f:
                 json.dump(clean_data, f)
     files = [x.name+".json" for x in dirs]
-    files.append("agenda_main.json")
+    files.append("2.json")
     for file in files:
         print(file)
         with open(f'data/{file}', 'r') as f:
