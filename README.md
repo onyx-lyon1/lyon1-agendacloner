@@ -31,3 +31,9 @@ To clone the Lyon 1 ADE agenda and generate the ICS URLs for each category, run 
 ```bash
 python agenda_clonner.py
 ```
+
+You also have a comparator script which take the first json file in alphabetical order in comparator/ and compare it with the others. It will print the missing agenda in the files (compared to the first one).
+
+```bash
+python comparator.py
+```

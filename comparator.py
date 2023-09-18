@@ -1,6 +1,9 @@
 import json
 import os
 
+"""This program compare all the files in the dir comparator with comparator/1.json and display all the missing dir in 
+the databases"""
+
 
 def find_missing_directories(dir1, dir2):
     missing_dirs = []
