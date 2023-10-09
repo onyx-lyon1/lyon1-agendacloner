@@ -101,14 +101,12 @@ def get_everyone(parent, root_name, session, request_headers, magic_auth_code, d
                 'https://adelb.univ-lyon1.fr/direct/gwtdirectplanning/DirectPlanningServiceProxy',
                 data=dir_to_request(
                     auth_code=magic_auth_code, dir_name=parent.name, dir_id=parent.identifier, depth=depth,
-                    root=root_name, index=index),
+                    root=root_name, index=index).encode('utf-8'),
                 cookies=session.cookies,
                 headers=request_headers
             )
             tmpdirs.extend(request_to_dirs(
                 raw_data=response.text, parent_name="" if depth == 0 else parent.name, root=depth == 0))
-            # if tmpdirs and not depth == 0:
-            #     tmpdirs.pop(index)
             with open(f"data/{root_name}/{parent.name.replace('/', '_slash_')}.json", "w") as file:
                 file.write(jsonpickle.encode(tmpdirs))
             if len(tmpdirs) - index < 149:
