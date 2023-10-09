@@ -202,28 +202,10 @@ def main():  # sourcery skip: for-index-replacement, remove-zero-from-range
             final_dirs.append(copy.deepcopy(
                 SmallDir().from_dir(dirs[directory])))
             final_dirs[directory].name = real_name[directory]
-        print("writing final file : 2.json")
-        f.write(jsonpickle.encode(final_dirs, unpicklable=False, make_refs=False))
-
-
-    print("lets remove duplicates !")
-    for directory in dirs:
-        sub_files = os.listdir(f'data/{directory.name}')
-        for file in sub_files:
-            print(file)
-            with open(f'data/{directory.name}/{file}', 'r') as f:
-                data = json.load(f)
-            clean_data = clean_duplicate(data)
-            with open(f'data/{directory.name}/{file}', 'w') as f:
-                json.dump(clean_data, f)
-    files = [x.name+".json" for x in dirs]
-    files.append("2.json")
-    for file in files:
-        print(file)
-        with open(f'data/{file}', 'r') as f:
-            data = json.load(f)
+        data = json.loads(jsonpickle.encode(final_dirs, unpicklable=False, make_refs=False))
         clean_data = clean_duplicate(data)
-        with open(f'data/{file}', 'w') as f:
-            json.dump(clean_data, f)
+        json.dump(clean_data, f)
+        print("writing final file : agenda_main.json")
+
 
 main()
