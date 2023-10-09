@@ -1,3 +1,6 @@
+import copy
+
+
 class Dir:
     def __init__(self, name="", children=None, identifier=-1, opened=False):
         self.children = []
