@@ -6,7 +6,7 @@ import 'package:encrypt/encrypt.dart';
 void main(List<String> arguments) async {
   //generate key and iv
   if (!File("key.txt").existsSync()) {
-    final key = Key.fromSecureRandom(256);
+    final key = Key.fromSecureRandom(32);
     File("key.txt").writeAsStringSync(key.base64);
   }
   if (!File("iv.txt").existsSync()) {
@@ -24,6 +24,7 @@ void main(List<String> arguments) async {
 
   //encrypt data
   final key = Key.fromBase64(File('key.txt').readAsStringSync());
+  print(AES(key));
   final iv = IV.fromBase64(File("iv.txt").readAsStringSync());
   File("iv.txt").writeAsStringSync(iv.base64);
   final encrypter = Encrypter(AES(key));
