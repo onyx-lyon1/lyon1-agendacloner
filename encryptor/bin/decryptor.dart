@@ -7,7 +7,7 @@ void main(List<String> arguments) async {
   //decrypt data
   final encrypted = File('agenda_ids.json.enc').readAsStringSync();
   final key = Key.fromBase64(File('key.txt').readAsStringSync());
-  final iv = IV.fromLength(16);
+  final iv = IV.fromBase64(File("iv.txt").readAsStringSync());
   final encrypter = Encrypter(AES(key));
   final decrypted = encrypter.decrypt(Encrypted.fromBase64(encrypted), iv: iv);
   final decoded = base64.decode(decrypted);
